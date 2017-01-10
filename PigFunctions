@@ -1,0 +1,55 @@
+student = LOAD '/home/acadgild/Onkar/session08/Student' USING PigStorage('\t') AS (name:chararray,surname:chararray,subject:chararray,marks:int);
+
+(Onkar,Maths,68)
+(Divya,Science,78)
+(Nikunj,Science,85)
+(Kapil,Maths,72)
+(Nayan,Science,68)
+(Akash,Science,80)
+(Atul,Maths,75)
+grunt> 
+
+
+1) Concat 
+
+CNCT_MARKS = FOREACH student GENERATE marks, CONCAT(name,surname) AS FULL_NAME;
+
+2) Tokenize
+
+TOKENS = FOREACH CNCT_MARKS GENERATE TOKENIZE(FULL_NAME) AS NAMES;
+
+3) SUM 
+
+GRP = GROUP student BY subject;
+
+SUM_MARKS = FOREACH GRP GENERATE group AS id, SUM(student.marks) AS SUM_SUBJ;
+
+4) MIN
+
+MIN_MARKS = FOREACH GRP GENERATE group AS id,MIN(student.marks) AS MIN_MARKS;
+
+5) MAX
+
+MAX_MARKS = FOREACH GRP GENERATE group AS id,MAX(student.marks) AS MAX_MARKS;
+
+6) LIMIT
+
+ORD = ORDER student BY marks DESC;
+
+LIM = LIMIT ORD 3;
+
+7) STORE
+
+STORE MAX_MARKS INTO '/home/acadgild/Onkar/session08/storeFile' USING PigStorage('#');
+
+8) Distinct
+
+DIST = DISTINCT student;
+
+9)Flatten :
+
+GRP_FLAT = FOREACH GRP GENERATE group AS id, FLATTEN(GRP) AS TUPLE;
+
+10) IsEmpty
+
+E = FILTER student BY IsEmpty(subject);
